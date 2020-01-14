@@ -1,3 +1,4 @@
+import 'package:divvide/screens/bill_detail.dart';
 import 'package:divvide/screens/home.dart';
 import 'package:flutter/material.dart';
 
@@ -7,8 +8,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Material App',
-      home: Home(),
+      title: 'DiVVide',
+      // theme: ThemeData.dark(),
+      initialRoute: '/',
+      routes: {
+        '/': (BuildContext context) => Home(),
+        'bill-detail': (BuildContext context) => BillDetail(),
+      },
       debugShowCheckedModeBanner: false,
     );
   }
