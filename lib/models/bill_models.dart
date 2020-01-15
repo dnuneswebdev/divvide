@@ -1,5 +1,5 @@
 class Bill {
-  int id;
+  String id;
   String place;
   String people;
   DateTime date;

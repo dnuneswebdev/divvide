@@ -37,9 +37,10 @@ class BillList extends StatelessWidget {
                         ? 'R\$ 0.00'
                         : 'R\$' + bills[index].totalBill.toStringAsFixed(2),
                     style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red),
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.deepOrange,
+                    ),
                   ),
                 ],
               ),

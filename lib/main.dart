@@ -9,6 +9,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'DiVVide',
+      theme: ThemeData(
+        primaryColor: Colors.blueGrey,
+        hintColor: Colors.deepOrange,
+      ),
       // theme: ThemeData.dark(),
       initialRoute: '/',
       routes: {
