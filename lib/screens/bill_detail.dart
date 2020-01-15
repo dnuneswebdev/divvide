@@ -1,9 +1,29 @@
 import 'package:divvide/models/bill_models.dart';
+import 'package:divvide/models/participants_model.dart';
+import 'package:divvide/shared/constants.dart';
 import 'package:divvide/widgets/participants_list.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class BillDetail extends StatelessWidget {
+class BillDetail extends StatefulWidget {
+  @override
+  _BillDetailState createState() => _BillDetailState();
+}
+
+class _BillDetailState extends State<BillDetail> {
+  final List<Participants> participants = [
+    // Participants(
+    //   id: '1',
+    //   name: 'Daniel',
+    //   meals: Meals(
+    //     meal: '1x Hamburgão',
+    //     price: 19.99,
+    //   ),
+    // ),
+  ];
+
+  final TextEditingController _newParticipantCtrl = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final Bill bill = ModalRoute.of(context).settings.arguments;
@@ -14,8 +34,9 @@ class BillDetail extends StatelessWidget {
           _customAppBar(bill),
           SliverList(
             delegate: SliverChildListDelegate([
-              SizedBox(height: 15),
-              ParticipantsList(),
+              SizedBox(height: 20),
+              _participantsRow(context),
+              ParticipantsList(participants: participants),
             ]),
           ),
         ],
@@ -23,8 +44,6 @@ class BillDetail extends StatelessWidget {
     );
   }
 
-  //WIDGETS
-  //CREATE CUSTOM SLIVER APPBAR
   Widget _customAppBar(Bill bill) {
     return SliverAppBar(
       title: Text(
@@ -35,11 +54,7 @@ class BillDetail extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          bottom: Radius.circular(50),
-        ),
-      ),
+      shape: circularBorderAppBar,
       elevation: 10,
       forceElevated: true,
       centerTitle: true,
@@ -60,12 +75,65 @@ class BillDetail extends StatelessWidget {
     );
   }
 
-  //CREATE LIST OF PARTICIPANTS
-  Widget _participantsList(Bill bill) {}
-}
+  Widget _participantsRow(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Text(
+            'Participantes: ${participants.length}',
+            style: TextStyle(fontSize: 18),
+          ),
+          FlatButton(
+            child: Text('Add participantes +'),
+            textColor: Theme.of(context).hintColor,
+            onPressed: () => _newParticipantDialog(context),
+          ),
+        ],
+      ),
+    );
+  }
 
-// Text(
-//   bill.totalBill == null
-//     ? 'R\$ 0.00'
-//     : bill.totalBill.toStringAsFixed(2),
-//),
+  void _newParticipantDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Add New Participant', textAlign: TextAlign.center),
+          content: TextField(
+            controller: _newParticipantCtrl,
+            decoration: InputDecoration(
+              prefixIcon: Icon(Icons.person_add),
+              labelText: 'Participant',
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Add+'),
+              color: Colors.deepOrange,
+              onPressed: () => _createNewParticipant(_newParticipantCtrl.text),
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  void _createNewParticipant(String name) {
+    if (name.isEmpty) {
+      return null;
+    }
+
+    final newParticipant = Participants(
+      id: DateTime.now().toString(),
+      name: name,
+    );
+
+    setState(() {
+      participants.add(newParticipant);
+    });
+
+    Navigator.of(context).pop();
+  }
+}

@@ -11,6 +11,7 @@ class MyApp extends StatelessWidget {
       title: 'DiVVide',
       theme: ThemeData(
         primaryColor: Colors.blueGrey,
+        primarySwatch: Colors.deepOrange,
         hintColor: Colors.deepOrange,
       ),
       // theme: ThemeData.dark(),

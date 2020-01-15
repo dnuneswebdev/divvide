@@ -1,4 +1,5 @@
 import 'package:divvide/models/bill_models.dart';
+// import 'package:divvide/shared/constants.dart';
 import 'package:divvide/widgets/bill_list.dart';
 import 'package:divvide/widgets/new_bill.dart';
 import 'package:flutter/material.dart';
@@ -15,12 +16,13 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        // shape: circularBorderAppBar,
+        // title: Image.asset('images/logo-1.png', fit: BoxFit.cover),
         title: Text('DIVVIDE'),
         centerTitle: true,
       ),
       body: bills.isEmpty ? _noBillsMessage() : BillList(bills: bills),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.deepOrange,
         onPressed: () {
           _newBillModal(context);
         },
