@@ -1,8 +1,9 @@
 import 'package:divvide/models/bill_models.dart';
 import 'package:divvide/models/participants_model.dart';
-import 'package:divvide/shared/constants.dart';
+import 'package:divvide/widgets/order.dart';
 import 'package:divvide/widgets/participants_list.dart';
 import 'package:flutter/material.dart';
+
 import 'package:intl/intl.dart';
 
 class BillDetail extends StatefulWidget {
@@ -11,16 +12,7 @@ class BillDetail extends StatefulWidget {
 }
 
 class _BillDetailState extends State<BillDetail> {
-  final List<Participants> participants = [
-    // Participants(
-    //   id: '1',
-    //   name: 'Daniel',
-    //   meals: Meals(
-    //     meal: '1x Hamburgão',
-    //     price: 19.99,
-    //   ),
-    // ),
-  ];
+  final List<Participants> participants = [];
 
   final TextEditingController _newParticipantCtrl = TextEditingController();
 
@@ -29,52 +21,27 @@ class _BillDetailState extends State<BillDetail> {
     final Bill bill = ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: <Widget>[
-          _customAppBar(bill),
-          SliverList(
-            delegate: SliverChildListDelegate([
-              SizedBox(height: 20),
-              _participantsRow(context),
-              ParticipantsList(participants: participants),
-            ]),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _customAppBar(Bill bill) {
-    return SliverAppBar(
-      title: Text(
-        bill.place,
-        overflow: TextOverflow.fade,
-        style: TextStyle(
-          fontSize: 30,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      shape: circularBorderAppBar,
-      elevation: 10,
-      forceElevated: true,
-      centerTitle: true,
-      expandedHeight: 100,
-      floating: false,
-      pinned: true,
-      flexibleSpace: FlexibleSpaceBar(
+      appBar: AppBar(
+        title: Text(bill.place),
         centerTitle: true,
-        title: Text(
-          DateFormat('dd/MM/yyyy').format(bill.date),
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-          ),
+      ),
+      body: Container(
+        child: Column(
+          children: <Widget>[
+            _participantsRow(context),
+            ParticipantsList(
+              participants: participants,
+              addNewMeal: _addNewMeal,
+            ),
+            // _entrieMeal(context),
+            Order(participants: participants),
+          ],
         ),
-        // title: Text(bill.place),
       ),
     );
   }
 
+  //WIDGETS
   Widget _participantsRow(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 15),
@@ -95,6 +62,27 @@ class _BillDetailState extends State<BillDetail> {
     );
   }
 
+  // Widget _entrieMeal(BuildContext context) {
+  //   return SingleChildScrollView(
+  //     child: Card(
+  //       margin: EdgeInsets.symmetric(horizontal: 16),
+  //       child: Padding(
+  //         padding: const EdgeInsets.all(10),
+  //         child: TextField(
+  //           decoration: InputDecoration(
+  //             labelText: 'Adicionar Entrada',
+  //             suffix: IconButton(
+  //               icon: Icon(Icons.save),
+  //               onPressed: () {},
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  //METHODS
   void _newParticipantDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -128,12 +116,30 @@ class _BillDetailState extends State<BillDetail> {
     final newParticipant = Participants(
       id: DateTime.now().toString(),
       name: name,
+      meals: List<Meals>(),
     );
 
     setState(() {
       participants.add(newParticipant);
     });
 
+    _newParticipantCtrl.clear();
+
     Navigator.of(context).pop();
+  }
+
+  void _addNewMeal(String meal, double price, int index) {
+    if (meal.isEmpty || price == null) {
+      return;
+    }
+
+    final newMeal = Meals(
+      name: meal,
+      price: price,
+    );
+
+    setState(() {
+      participants[index].meals.add(newMeal);
+    });
   }
 }

@@ -1,14 +1,29 @@
 class Participants {
   String id;
   String name;
-  dynamic meals;
+  List<Meals> meals;
+  double totalParticipant;
 
-  Participants({this.id, this.name, this.meals});
+  Participants({this.id, this.name, this.meals, this.totalParticipant});
+
+  static double calcTotalBill() {
+    List<Participants> participants = new List();
+
+    double totalBill = 0.00;
+
+    participants.forEach((participant) {
+      totalBill += participant.totalParticipant;
+    });
+
+    return totalBill;
+  }
 }
 
 class Meals {
-  String meal;
+  String name;
   double price;
 
-  Meals({this.meal, this.price});
+  Meals({this.name, this.price});
 }
+
+//METHODS

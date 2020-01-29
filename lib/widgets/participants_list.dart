@@ -1,23 +1,31 @@
 import 'package:divvide/models/participants_model.dart';
 import 'package:flutter/material.dart';
 
-class ParticipantsList extends StatelessWidget {
+class ParticipantsList extends StatefulWidget {
   final List<Participants> participants;
 
-  ParticipantsList({@required this.participants});
+  final Function addNewMeal;
 
+  ParticipantsList({@required this.participants, @required this.addNewMeal});
+
+  @override
+  _ParticipantsListState createState() => _ParticipantsListState();
+}
+
+class _ParticipantsListState extends State<ParticipantsList> {
   final TextEditingController _newMealNameCtrl = TextEditingController();
   final TextEditingController _newMealPriceCtrl = TextEditingController();
 
-  final double _totalParticipant = 00.00;
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(5),
-      child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: participants.map((participant) {
+    return Expanded(
+      child: ListView.builder(
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        itemCount: widget.participants.length,
+        itemBuilder: (context, index) {
+          if (widget.participants.isEmpty) {
+            return Center(child: Text('Nenhum participante adicionado...'));
+          } else {
             return Card(
               elevation: 2,
               child: Column(
@@ -29,63 +37,71 @@ class ParticipantsList extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Text(
-                          participant.name,
+                          widget.participants[index].name,
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 18,
                           ),
                         ),
-                        _buildMealsColumn(),
+                        widget.participants[index].meals.length == 0
+                            ? Text('Adicione uma comida')
+                            : Column(
+                                children: widget.participants[index].meals
+                                    .map((meal) {
+                                  return Row(
+                                    children: <Widget>[
+                                      Text(meal.name),
+                                      Text(
+                                          '  R\$${meal.price.toStringAsFixed(2)}'),
+                                    ],
+                                  );
+                                }).toList(),
+                              ),
                         FlatButton(
                           child: Icon(Icons.add),
-                          onPressed: () => _newMealDialog(context),
+                          onPressed: () => _newMealDialog(context, index),
                         ),
                       ],
                     ),
                   ),
-                  Divider(),
+                  Divider(thickness: 1),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     child: Text(
-                      'Total: \$ $_totalParticipant',
+                      widget.participants[index].meals.isEmpty
+                          ? 'R\$ 0.00'
+                          : 'Total: R\$ ${_getTotalPerParticipant(index).toStringAsFixed(2)}',
                       textAlign: TextAlign.right,
                       style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
               ),
             );
-          }).toList()),
+          }
+        },
+      ),
     );
   }
 
-  //WIDGETS
-  //ADD A NEW ROW FOR MEALS AND PRICE
-  Widget _buildMealsColumn() {
-    return Column(
-        children: participants.map((participant) {
-      if (participant.meals == null) {
-        return Text('No meals added yet', style: TextStyle(fontSize: 16));
-      } else {
-        return Row(
-          children: <Widget>[
-            Text(participant.meals.meal, style: TextStyle(fontSize: 16)),
-            Text('  \$' + participant.meals.price.toString(),
-                style: TextStyle(fontSize: 16)),
-          ],
-        );
-      }
-    }).toList());
+  double _getTotalPerParticipant(int index) {
+    double totalPerParticipant = 0.0;
+
+    widget.participants[index].meals.map((meal) {
+      totalPerParticipant += meal.price;
+    }).toString();
+
+    widget.participants[index].totalParticipant = totalPerParticipant;
+
+    return totalPerParticipant;
   }
 
-  //METHODS
-  //ADD NEW MEAL TO THE PARTICIPANT
-  void _newMealDialog(BuildContext context) {
+  void _newMealDialog(BuildContext context, int index) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Add New Meal', textAlign: TextAlign.center),
+          title: Text('Adicionar nova comida', textAlign: TextAlign.center),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -93,14 +109,14 @@ class ParticipantsList extends StatelessWidget {
                 controller: _newMealNameCtrl,
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.fastfood),
-                  labelText: 'Meal',
+                  labelText: 'Comida/Bebida',
                 ),
               ),
               TextField(
                 controller: _newMealPriceCtrl,
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.monetization_on),
-                  labelText: 'Price',
+                  labelText: 'Preço',
                 ),
                 keyboardType: TextInputType.phone,
               ),
@@ -110,25 +126,22 @@ class ParticipantsList extends StatelessWidget {
             FlatButton(
               child: Text('Add +'),
               color: Colors.deepOrange,
-              onPressed: () => _createNewMeal(context, _newMealNameCtrl.text,
-                  _newMealPriceCtrl.text as double),
-            )
+              onPressed: () => _submitMealData(index),
+            ),
           ],
         );
       },
     );
   }
 
-  //METHODS
-  void _createNewMeal(BuildContext context, String meal, double price) {
-    if (meal == null || price == null) {
-      return;
-    }
-
-    final newMeal = Meals(
-      meal: meal,
-      price: price,
+  void _submitMealData(int index) {
+    widget.addNewMeal(
+      _newMealNameCtrl.text,
+      double.parse(_newMealPriceCtrl.text),
+      index,
     );
+    _newMealNameCtrl.clear();
+    _newMealPriceCtrl.clear();
 
     Navigator.of(context).pop();
   }

@@ -5,3 +5,8 @@ const circularBorderAppBar = RoundedRectangleBorder(
     bottom: Radius.circular(50),
   ),
 );
+
+const defaultOrderTexts = TextStyle(
+  fontSize: 14,
+  fontWeight: FontWeight.bold,
+);
